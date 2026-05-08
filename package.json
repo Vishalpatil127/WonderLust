@@ -12,6 +12,7 @@
   "dependencies": {
     "ejs": "^5.0.2",
     "express": "^5.2.1",
+    "method-override": "^3.0.0",
     "mongoose": "^9.4.1",
     "nodemon": "^3.1.14"
   }
