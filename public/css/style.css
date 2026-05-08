@@ -1,0 +1,65 @@
+.navbar{
+    height:5rem ;
+    background-color: white;
+}
+.fa-compass{
+    color: #fe424d;
+    font-size: 2rem;
+}
+.nav-link{
+    color: #222222 !important;
+}
+.footer {
+    background-color: #f0f0f0;
+    padding: 1.5rem 0;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: center;
+}
+.footer__socials {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+.footer__socials a {
+    color: #222222;
+    font-size: 1.2rem;
+}
+.footer__socials a:hover {
+    color: #000000;
+}
+.footer__brand {
+    font-size: 0.95rem;
+    color: #444444;
+}
+.footer__links {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.footer__links a {
+    color: #222222;
+    text-decoration: none;
+    font-size: 0.95rem;
+}
+.footer__links a:hover {
+    text-decoration: underline;
+}
+.footer__separator {
+    color: #888888;
+}
+/* remove old footer-specific classes */
+.f-info,
+.f-info-links,
+.f-info-socials,
+.f-info-links a,
+.f-info-links a:hover {
+    display: block;
+    width: auto;
+    margin: 0;
+    padding: 0;
+}
