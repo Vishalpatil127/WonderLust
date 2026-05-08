@@ -63,3 +63,55 @@
     margin: 0;
     padding: 0;
 }
+
+
+/*cards*/
+.card{
+    position: relative;
+    overflow: hidden;
+    border:none !important;
+    margin-bottom: 2rem;
+}
+.card > * {
+    position: relative;
+    z-index: 2;
+}
+.card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.2);
+    opacity: 0.2;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+.card:hover::before {
+    opacity: 0.3;
+}
+.card-img-top{
+    border-radius: 1rem !important;
+    width: 100%;
+    object-fit: cover !important;
+}
+.card-body{
+    padding: 0;
+}
+
+.card-text p{
+    font-weight: 400 !important;
+}
+.listing-link {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+}
+.listing-link:hover {
+    color: inherit;
+    text-decoration: none;
+}
+.listing-link .card {
+    color: inherit;
+}
+.listing-list{
+    text-decoration: none !important;
+}
