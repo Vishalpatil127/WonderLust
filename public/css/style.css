@@ -133,3 +133,16 @@ body{
 .edit-btn{
     background-color: #fe424d !important;
 }
+
+/*show page*/
+.show-img{
+    height: 20rem;
+    object-fit: cover;
+}
+.btns{
+    display: flex;
+    gap: 1rem;
+}
+.edit-btn{
+    background-color: #fe424d !important;
+}
