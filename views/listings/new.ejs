@@ -1,27 +1,46 @@
 <% layout("layouts/boilerplate") %>
+<div class="row">
+    <div class="col-8 offset-2">
 <body>
+    <br> 
     <h1>create a new listing</h1>
  <form method="POST" action="/listings">
+    <div class="mb-3">
+        <label for="title" class="form-label">Title</label>
+        <input name="listing[title]" placeholder="enter title" type="text" class="form-control">
+    </div>
+    <div class="mb-3"   >
+        <label for="description" class="form-label">Description</label>
+        <textarea name="listing[description]" placeholder="enter description" class="form-control"></textarea>
+    </div>
 
-    <input name="listing[title]" placeholder="enter title" type="text">
-    <br>
+    <div class="mb-3">
+        <label for="image" class="form-label">Image Link</label>
+        <input name="listing[image]" placeholder="enter image link" type="text" class="form-control">
+    </div>
+    <div class="row">
+        <div class="mb-3 col-md-4">
+            <label for="price" class="form-label">Price</label>
+            <input name="listing[price]" placeholder="enter price" type="number" class="form-control">
+        </div>
+        <div class="mb-3 col-md-8">
+        <label for="country" class="form-label">Country</label>
+        <input name="listing[country]" placeholder="enter country" type="text" class="form-control">
+    </div >
+    </div>
 
-    <textarea name="listing[description]" placeholder="enter description"></textarea>
-    <br>
+    <div class="mb-3">
+        <label for="location" class="form-label">Location</label>
+        <input name="listing[location]" placeholder="enter location" type="text" class="form-control">
+    </div>
 
-    <input name="listing[image]" placeholder="enter image link" type="text">
-    <br>
+    
 
-    <input name="listing[price]" placeholder="enter price" type="number">
-    <br>
+    <button class="btn btn-dark add-btn">Add</button>
 
-    <input name="listing[location]" placeholder="enter location" type="text">
-    <br>
-
-    <input name="listing[country]" placeholder="enter country" type="text">
-    <br>
-
-    <button>submit</button>
+    <br><br>
 
 </form>
 </body>
+</div>
+</div>

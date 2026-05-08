@@ -42,10 +42,14 @@ app.get("/listings/new",(req,res)=>{
 
 //craete route
 app.post("/listings", async(req,res)=>{
+   try {
    // let{title,description,image,price,location,country}= req.body;
  const newlisting= new Listing (req.body.listing)
   await newlisting.save();
   res.redirect("/listings");
+   } catch(err) {
+     res.send("Error: " + err.message);
+   }
 })
 
 // edit route

@@ -10,7 +10,7 @@
             <img src="<%= listing.image %>" class="card-img-top" alt="listing image" style="height:20rem; object-fit: cover;" >
             <div class="card-body">
               <h5 class="card-title"><%= listing.title %></h5>
-              <p class="card-text">&#8377; <%= listing.price.toLocaleString("en-IN") %> / night</p>
+              <p class="card-text"><% if(listing.price) { %>&#8377; <%= listing.price.toLocaleString("en-IN") %> / night<% } else { %>Price not set<% } %></p>
             </div>
           </div>
         </div>
