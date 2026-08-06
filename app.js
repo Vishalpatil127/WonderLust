@@ -1,102 +1,78 @@
+require("dotenv").config();
 const express = require("express");
+const cors = require("cors");
+const morgan = require("morgan");
+const cookieParser = require("cookie-parser");
+const swaggerUi = require("swagger-ui-express");
+const connectDB = require("./config/db");
+const env = require("./config/env");
+const logger = require("./config/logger");
+const swaggerSpec = require("./docs/swagger");
+const { securityMiddleware } = require("./middleware/security");
+const listingRoutes = require("./routes/listings");
+const userRoutes = require("./routes/users");
+const bookingRoutes = require("./routes/bookings");
+const wishlistRoutes = require("./routes/wishlist");
+const paymentRoutes = require("./routes/payments");
+const oauthRoutes = require("./routes/oauth");
+const passport = require("./services/oauthService");
+const dashboardRoutes = require("./routes/dashboard");
+const uploadRoutes = require("./routes/uploads");
+const reviewRoutes = require("./routes/reviews");
+const { notFound, errorHandler } = require("./middleware/errorHandler");
+
 const app = express();
-const mongoose = require("mongoose");
-const Listing = require("./models/listing.js")
-const path = require("path");
-const methodOverride = require("method-override")
-const ejsmate = require("ejs-mate")
+const PORT = env.PORT;
+const allowedOrigins = (env.CLIENT_URL || "http://localhost:5173")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
 
-
-
-
-main().then(()=>{
-    console.log("connected to db")
-}).catch(error=>{
-console.log(error);
-});
-async function main() {
-    await mongoose.connect("mongodb://127.0.0.1:27017/wonderlust") ;
-}
-
-app.set("view engine", "ejs");
-app.set("views",path.join(__dirname,"views"))
-app.use(express.urlencoded({extended:true}))
-app.use(methodOverride("_method"))
-app.engine('ejs',ejsmate);
-app.use(express.static(path.join(__dirname,"public")))
-
-app.get("/", (req,res)=>{
-    res.send(" hi i am the root");
-})
-
-
-app.get("/listings",async(req,res)=>{
-  const allListings= await Listing.find({});
-     res.render("listings/indexx.ejs",{allListings});
-    })
-
-// new route
-app.get("/listings/new",(req,res)=>{
-    res.render("listings/new.ejs")
-})
-
-//craete route
-app.post("/listings", async(req,res)=>{
-   try {
-   // let{title,description,image,price,location,country}= req.body;
- const newlisting= new Listing (req.body.listing)
-  await newlisting.save();
-  res.redirect("/listings");
-   } catch(err) {
-     res.send("Error: " + err.message);
-   }
-})
-
-// edit route
-app.get("/listings/:id/edit", async(req,res)=>{
-    let{id}=req.params;
-      const listing = await Listing.findById(id); 
-      res.render("listings/edit.ejs",{listing})
-})
-//update route
-app.put("/listings/:id",async(req,res)=>{
-    let{id}= req.params;
-   await Listing.findByIdAndUpdate(id,{...req.body.listing})
-   res.redirect(`/listings/${id}`)
-})
-
-app.delete("/listings/:id",async(req,res)=>{
-    let{id}=req.params;
-    let deletedListing= await Listing.findByIdAndDelete(id)
-     res.redirect("/listings")
-})
-// show route
-app.get("/listings/:id",async(req,res)=>{
-      let{id}=req.params;
-      const listing = await Listing.findById(id);
-      
-      res.render("listings/show.ejs",{listing});
-})
-
-
-
-
-// app.get("/testlisting",(req,res)=>{
-//       let sampleListing = new Listing({
-//         title:"my new villa",
-//         description:"by the beach",
-//         price:1200,
-//         location:"calangute , goa",
-//         country:"india"
-//       });
-//       sampleListing.save();
-//       console.log("sample was saved ");
-//       res.send("successful testing")
-// })
-
-
-
-app.listen(8080, ()=>{
-    console.log("sever is listning to 8080")
+connectDB().catch((err) => {
+  logger.error("MongoDB connection failed:", err.message);
+  process.exit(1);
 });
 
+app.use(morgan("combined"));
+app.use(cookieParser());
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin) || /^http:\/\/localhost:\d+$/.test(origin)) {
+        callback(null, true);
+        return;
+      }
+
+      callback(new Error("Not allowed by CORS"));
+    },
+    credentials: true,
+  })
+);
+app.use(securityMiddleware);
+app.use(express.json({ limit: "1mb" }));
+app.use(express.urlencoded({ extended: true, limit: "1mb" }));
+
+// Initialize Passport so `passport.authenticate` works in routes
+app.use(passport.initialize());
+
+app.get("/", (req, res) => {
+  res.json({ message: "Wonderlust API is running" });
+});
+
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use("/api/auth", userRoutes);
+app.use("/api/listings", listingRoutes);
+app.use("/api/bookings", bookingRoutes);
+app.use("/api/wishlist", wishlistRoutes);
+app.use("/api/payments", paymentRoutes);
+app.use("/api/oauth", oauthRoutes);
+app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/uploads", uploadRoutes);
+app.use("/api/reviews", reviewRoutes);
+
+app.use(notFound);
+app.use(errorHandler);
+
+app.listen(PORT, () => {
+  logger.info(`Server listening on port ${PORT}`);
+});
