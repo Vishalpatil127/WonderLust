@@ -23,6 +23,10 @@ const { notFound, errorHandler } = require("./middleware/errorHandler");
 
 const app = express();
 const PORT = env.PORT;
+
+// Trust proxy — required for rate limiter and secure cookies behind nginx/load balancers
+app.set("trust proxy", 1);
+
 const allowedOrigins = (env.CLIENT_URL || "http://localhost:5173")
   .split(",")
   .map((origin) => origin.trim())
@@ -38,11 +42,12 @@ app.use(cookieParser());
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin) || /^http:\/\/localhost:\d+$/.test(origin)) {
-        callback(null, true);
-        return;
+      if (!origin) return callback(null, true); // allow server-to-server
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+      // Allow all localhost ports in development only
+      if (env.NODE_ENV !== "production" && /^http:\/\/localhost:\d+$/.test(origin)) {
+        return callback(null, true);
       }
-
       callback(new Error("Not allowed by CORS"));
     },
     credentials: true,

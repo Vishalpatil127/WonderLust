@@ -1,29 +1,45 @@
 const { getRedisClient } = require("../config/redis");
 
+/**
+ * Returns cached value for key, or null if not found / Redis unavailable.
+ */
 const getCachedData = async (key) => {
   const client = getRedisClient();
   if (!client) return null;
-
   try {
-    await client.connect();
     const value = await client.get(key);
     return value ? JSON.parse(value) : null;
-  } catch (error) {
+  } catch {
     return null;
   }
 };
 
+/**
+ * Stores value under key with optional TTL (seconds). No-ops if Redis unavailable.
+ */
 const setCachedData = async (key, value, ttlSeconds = 120) => {
   const client = getRedisClient();
-  if (!client) return null;
-
+  if (!client) return false;
   try {
-    await client.connect();
     await client.set(key, JSON.stringify(value), { EX: ttlSeconds });
     return true;
-  } catch (error) {
-    return null;
+  } catch {
+    return false;
   }
 };
 
-module.exports = { getCachedData, setCachedData };
+/**
+ * Deletes a key. No-ops if Redis unavailable.
+ */
+const deleteCachedData = async (key) => {
+  const client = getRedisClient();
+  if (!client) return false;
+  try {
+    await client.del(key);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+module.exports = { getCachedData, setCachedData, deleteCachedData };

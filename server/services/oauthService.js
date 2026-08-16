@@ -9,7 +9,7 @@ if (env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET) {
       {
         clientID: env.GOOGLE_CLIENT_ID,
         clientSecret: env.GOOGLE_CLIENT_SECRET,
-        callbackURL: `http://localhost:${env.PORT}/api/oauth/google/callback`,
+        callbackURL: env.GOOGLE_CALLBACK_URL || `http://localhost:${env.PORT}/api/oauth/google/callback`,
       },
       async (accessToken, refreshToken, profile, done) => {
         try {

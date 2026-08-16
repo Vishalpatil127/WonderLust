@@ -6,6 +6,14 @@ const limiter = rateLimit({
   max: 500,
   standardHeaders: true,
   legacyHeaders: false,
+  keyGenerator: (req) => {
+    // Use X-Forwarded-For if behind proxy, otherwise use remoteAddress
+    return req.ip || req.connection.remoteAddress;
+  },
+  skip: (req) => {
+    // Skip rate limiting for health checks and favicons
+    return req.path === '/' || req.path === '/favicon.ico';
+  },
 });
 
 const sanitizeObject = (value) => {
