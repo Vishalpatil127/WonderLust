@@ -8,6 +8,8 @@ router.post("/register", users.register);
 router.post("/login", users.login);
 router.post("/admin/login", users.adminLogin);
 router.post("/admin/verify-otp", users.verifyAdminOtp);
+router.post("/host/login", users.hostLogin);
+router.post("/host/verify-otp", users.verifyHostOtp);
 router.post("/refresh", users.refreshToken);
 router.post("/logout", authenticate, users.logout);
 router.get("/me", authenticate, users.getMe);

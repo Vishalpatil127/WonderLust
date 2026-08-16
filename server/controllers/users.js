@@ -263,3 +263,66 @@ module.exports.verifyAdminOtp = asyncHandler(async (req, res) => {
     ...tokens,
   });
 });
+
+/* ─── Host two-step login ─────────────────────────────────────────────────── */
+
+/**
+ * Step 1 — Verify host credentials, send OTP to email.
+ */
+module.exports.hostLogin = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password) {
+    throw new ExpressError("Email and password are required", 400);
+  }
+
+  const user = await User.findOne({ email });
+  if (!user || user.role !== "host") {
+    throw new ExpressError("Invalid credentials", 401);
+  }
+  if (!(await user.comparePassword(password))) {
+    throw new ExpressError("Invalid credentials", 401);
+  }
+
+  const otp = authService.createOtp();
+  await Otp.findOneAndUpdate(
+    { email },
+    { email, otp, expiresAt: new Date(Date.now() + 10 * 60 * 1000) },
+    { upsert: true, new: true }
+  );
+
+  const { sendHostOtpEmail } = require("../services/emailService");
+  await sendHostOtpEmail({ to: email, username: user.username, otp });
+
+  sendSuccess(res, 200, {
+    message: "OTP sent to your email. Enter it to complete sign-in.",
+    email,
+  });
+});
+
+/**
+ * Step 2 — Verify OTP, issue tokens.
+ */
+module.exports.verifyHostOtp = asyncHandler(async (req, res) => {
+  const { email, otp } = req.body;
+  if (!email || !otp) {
+    throw new ExpressError("Email and OTP are required", 400);
+  }
+
+  const record = await Otp.findOne({ email, otp });
+  if (!record || record.expiresAt < new Date()) {
+    throw new ExpressError("Invalid or expired OTP. Please request a new one.", 400);
+  }
+
+  const user = await User.findOne({ email });
+  if (!user || user.role !== "host") {
+    throw new ExpressError("Unauthorized", 403);
+  }
+
+  await Otp.deleteOne({ _id: record._id });
+
+  const tokens = await authService.issueTokens(user);
+  sendSuccess(res, 200, {
+    user: { id: user._id, username: user.username, email: user.email, role: user.role },
+    ...tokens,
+  });
+});

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Globe, Eye, EyeOff, ArrowRight, ShieldCheck } from "lucide-react";
+import { Globe, Eye, EyeOff, ArrowRight, ShieldCheck, RefreshCw } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
 const ROLE_LABELS = {
@@ -9,27 +9,88 @@ const ROLE_LABELS = {
   customer: { label: "Explorer", color: "text-brand",     bg: "bg-brand-50 border-brand/20" },
 };
 
+/* ── OTP digit input (reused from AdminLogin) ─────────────────────────────── */
+import { useRef } from "react";
+function OtpInput({ value, onChange }) {
+  const refs = [useRef(), useRef(), useRef(), useRef(), useRef(), useRef()];
+  const digits = value.padEnd(6, "").split("");
+  const handleKey = (i, e) => {
+    if (e.key === "Backspace") {
+      const n = digits.slice(); n[i] = "";
+      onChange(n.join("").trimEnd());
+      if (i > 0) refs[i - 1].current?.focus();
+      return;
+    }
+    if (!/^\d$/.test(e.key)) return;
+    const n = digits.slice(); n[i] = e.key;
+    onChange(n.join("").trimEnd());
+    if (i < 5) refs[i + 1].current?.focus();
+  };
+  const handlePaste = (e) => {
+    const p = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
+    onChange(p);
+    refs[Math.min(p.length, 5)].current?.focus();
+  };
+  return (
+    <div className="flex items-center justify-center gap-2" onPaste={handlePaste}>
+      {digits.map((d, i) => (
+        <input key={i} ref={refs[i]} type="text" inputMode="numeric" maxLength={1}
+          value={d} onChange={() => {}} onKeyDown={(e) => handleKey(i, e)}
+          aria-label={`OTP digit ${i + 1}`}
+          className={`w-11 h-14 text-center text-xl font-black rounded-xl border-2 bg-white outline-none transition-all
+            ${d ? "border-amber-400" : "border-gray-200"} focus:border-amber-400 focus:ring-2 focus:ring-amber-100`}
+        />
+      ))}
+    </div>
+  );
+}
+
 export default function Login() {
-  const { login } = useAuth();
+  const { login, hostLogin, verifyHostOtp } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from?.pathname || null;
 
-  const [form, setForm]     = useState({ email: "", password: "" });
-  const [showPw, setShowPw] = useState(false);
-  const [error, setError]   = useState("");
+  const [form, setForm]       = useState({ email: "", password: "" });
+  const [showPw, setShowPw]   = useState(false);
+  const [error, setError]     = useState("");
   const [loading, setLoading] = useState(false);
+  // Host OTP state
+  const [step,      setStep]      = useState("credentials"); // credentials | otp
+  const [otp,       setOtp]       = useState("");
+  const [countdown, setCountdown] = useState(0);
+  const [resending, setResending] = useState(false);
 
   const set = (e) => setForm((p) => ({ ...p, [e.target.name]: e.target.value }));
+
+  const startCountdown = () => {
+    setCountdown(60);
+    const t = setInterval(() => setCountdown((c) => { if (c <= 1) { clearInterval(t); return 0; } return c - 1; }), 1000);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setLoading(true);
     try {
-      const data = await login(form.email, form.password);
+      // Try host login first (OTP flow), fall back to regular login
+      // We detect by the error — if user is a host, hostLogin succeeds with OTP step
+      // For non-hosts, we use regular login
+      let data;
+      try {
+        data = await hostLogin(form.email, form.password);
+        // hostLogin succeeded → user is a host → show OTP step
+        setStep("otp");
+        startCountdown();
+        setLoading(false);
+        return;
+      } catch (hostErr) {
+        // Not a host (401 with "Invalid credentials" for non-hosts) — try regular login
+        if (hostErr.response?.status !== 401) throw hostErr;
+        data = await login(form.email, form.password);
+      }
+
       const role = data.user?.role;
-      // Role-aware redirect
       if (from) { navigate(from, { replace: true }); return; }
       if (role === "admin")    navigate("/admin",          { replace: true });
       else if (role === "host") navigate("/host/dashboard", { replace: true });
@@ -39,6 +100,29 @@ export default function Login() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleOtp = async (e) => {
+    e.preventDefault();
+    if (otp.length < 6) { setError("Enter all 6 digits."); return; }
+    setError("");
+    setLoading(true);
+    try {
+      await verifyHostOtp(form.email, otp);
+      navigate(from || "/host/dashboard", { replace: true });
+    } catch (err) {
+      setError(err.response?.data?.message || "Invalid or expired OTP.");
+      setOtp("");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResend = async () => {
+    setResending(true); setError(""); setOtp("");
+    try { await hostLogin(form.email, form.password); startCountdown(); }
+    catch (err) { setError(err.response?.data?.message || "Could not resend OTP."); }
+    finally { setResending(false); }
   };
 
   return (
@@ -90,6 +174,39 @@ export default function Login() {
 
           {error && <div className="alert-error mb-5">{error}</div>}
 
+          {step === "otp" ? (
+            /* ── Host OTP step ── */
+            <form onSubmit={handleOtp} className="space-y-5">
+              <div className="text-center mb-2">
+                <div className="w-12 h-12 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center mx-auto mb-3">
+                  <span className="text-2xl">🏠</span>
+                </div>
+                <p className="text-sm font-semibold text-gray-900">Host Verification</p>
+                <p className="text-xs text-gray-400 mt-1">
+                  OTP sent to <span className="font-semibold text-gray-700">{form.email}</span>
+                </p>
+              </div>
+              <OtpInput value={otp} onChange={setOtp} />
+              <button type="submit" disabled={loading || otp.length < 6}
+                className="btn btn-primary btn-lg w-full gap-2" style={{ background: "#d97706", borderColor: "#d97706" }}>
+                {loading ? <><span className="spinner" /> Verifying…</> : "Verify & Sign in"}
+              </button>
+              <div className="flex items-center justify-center gap-2">
+                {countdown > 0 ? (
+                  <p className="text-xs text-gray-400">Resend in <span className="font-semibold text-gray-600">{countdown}s</span></p>
+                ) : (
+                  <button type="button" onClick={handleResend} disabled={resending}
+                    className="flex items-center gap-1.5 text-xs text-amber-600 hover:text-amber-700 font-semibold">
+                    {resending ? <><span className="spinner w-3 h-3" /> Resending…</> : <><RefreshCw className="w-3 h-3" /> Resend OTP</>}
+                  </button>
+                )}
+              </div>
+              <button type="button" onClick={() => { setStep("credentials"); setOtp(""); setError(""); }}
+                className="w-full text-xs text-gray-400 hover:text-gray-600 text-center">
+                ← Back to sign in
+              </button>
+            </form>
+          ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label htmlFor="email" className="input-label">Email address</label>
@@ -123,6 +240,7 @@ export default function Login() {
                 : <><span>Sign in</span><ArrowRight className="w-4 h-4" /></>}
             </button>
           </form>
+          )} {/* end step conditional */}
 
           <div className="mt-6 pt-6 border-t border-gray-100 space-y-3">
             {/* Google OAuth — only shown when configured */}

@@ -50,6 +50,17 @@ export function AuthProvider({ children }) {
     setUser(null);
   }, []);
 
+  const hostLogin = async (email, password) => {
+    const res = await api.post("/auth/host/login", { email, password });
+    return res.data; // { message, email }
+  };
+
+  const verifyHostOtp = async (email, otp) => {
+    const res = await api.post("/auth/host/verify-otp", { email, otp });
+    _persist(res.data);
+    return res.data;
+  };
+
   const adminLogin = async (email, password) => {
     // Step 1 — verify credentials and trigger OTP (no tokens returned yet)
     const res = await api.post("/auth/admin/login", { email, password });
@@ -92,7 +103,7 @@ export function AuthProvider({ children }) {
   return (
     <AuthContext.Provider value={{
       user, loading,
-      login, adminLogin, verifyAdminOtp, register, logout,
+      login, adminLogin, verifyAdminOtp, hostLogin, verifyHostOtp, register, logout,
       refreshAccessToken, forgotPassword, resetPassword,
       isAdmin, isHost, isCustomer,
       setUserFromTokens,
