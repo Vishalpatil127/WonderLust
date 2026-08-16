@@ -32,9 +32,16 @@ const allowedOrigins = (env.CLIENT_URL || "http://localhost:5173")
   .map((origin) => origin.trim())
   .filter(Boolean);
 
-connectDB().catch((err) => {
+// Connect to MongoDB — on Vercel serverless, connections are reused across invocations
+let dbConnected = false;
+const ensureDB = async () => {
+  if (!dbConnected) {
+    await connectDB();
+    dbConnected = true;
+  }
+};
+ensureDB().catch((err) => {
   logger.error("MongoDB connection failed:", err.message);
-  process.exit(1);
 });
 
 app.use(morgan("combined"));
@@ -83,6 +90,11 @@ app.use("/api/reviews", reviewRoutes);
 app.use(notFound);
 app.use(errorHandler);
 
-app.listen(PORT, () => {
-  logger.info(`Server listening on port ${PORT}`);
-});
+// Export for Vercel serverless — also start server when run directly (local dev)
+if (require.main === module) {
+  app.listen(PORT, () => {
+    logger.info(`Server listening on port ${PORT}`);
+  });
+}
+
+module.exports = app;
