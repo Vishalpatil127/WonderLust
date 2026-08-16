@@ -187,7 +187,7 @@ export default function Register() {
             {import.meta.env.VITE_GOOGLE_AUTH_ENABLED === "true" && (
               <>
                 <a
-                  href={`${import.meta.env.VITE_API_URL?.replace("/api", "") || "http://localhost:8080"}/api/oauth/google`}
+                  href={`${import.meta.env.VITE_API_BASE_URL || "http://localhost:8080"}/api/oauth/google`}
                   className="flex items-center justify-center gap-3 w-full px-4 py-3 rounded-xl border border-gray-200
                              bg-white text-sm font-semibold text-gray-700 hover:bg-gray-50 hover:border-gray-300
                              transition-all shadow-sm"

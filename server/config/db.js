@@ -1,9 +1,12 @@
 const mongoose = require("mongoose");
+const env = require("./env");
+const logger = require("./logger");
 
 const connectDB = async () => {
-  const uri = process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/wonderlust";
-  await mongoose.connect(uri);
-  console.log("Connected to MongoDB");
+  await mongoose.connect(env.MONGODB_URI, {
+    serverSelectionTimeoutMS: 5000,
+  });
+  logger.info("Connected to MongoDB");
 };
 
 module.exports = connectDB;

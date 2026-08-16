@@ -1,8 +1,12 @@
 {
   "name": "backend-project",
   "version": "1.0.0",
-  "description": "",
+  "description": "Wonderlust backend API",
   "main": "app.js",
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  },
   "scripts": {
     "start": "node app.js",
     "dev": "nodemon app.js",
@@ -31,7 +35,6 @@
     "morgan": "^1.10.0",
     "multer": "^2.0.0",
     "nodemailer": "^7.0.0",
-    "nodemon": "^3.1.14",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
     "razorpay": "^2.8.4",
@@ -40,13 +43,13 @@
     "swagger-jsdoc": "^6.0.0",
     "swagger-ui-express": "^5.0.0",
     "winston": "^3.0.0",
-    "wonderlust-workspace": "file:..",
     "xss-clean": "^0.1.4",
     "zod": "^3.0.0"
   },
   "devDependencies": {
     "concurrently": "^10.0.3",
     "jest": "^30.0.0",
+    "nodemon": "^3.1.14",
     "supertest": "^7.0.0"
   }
 }
