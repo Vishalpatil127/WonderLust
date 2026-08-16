@@ -14,8 +14,7 @@
     "lucide-react": "^0.525.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
-    "react-router-dom": "^7.18.1",
-    "wonderlust-workspace": "file:.."
+    "react-router-dom": "^7.18.1"
   },
   "devDependencies": {
     "@types/react": "^19.2.17",
