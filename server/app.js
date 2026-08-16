@@ -64,6 +64,11 @@ app.get("/", (req, res) => {
   res.json({ message: "Wonderlust API is running" });
 });
 
+// Suppress favicon and common browser requests — return 204 No Content
+app.get("/favicon.ico", (req, res) => res.status(204).end());
+app.get("/favicon.png", (req, res) => res.status(204).end());
+app.get("/robots.txt", (req, res) => res.status(204).end());
+
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use("/api/auth", userRoutes);
 app.use("/api/listings", listingRoutes);
