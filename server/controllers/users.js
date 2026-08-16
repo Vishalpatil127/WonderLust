@@ -12,9 +12,9 @@ module.exports.register = asyncHandler(async (req, res) => {
     throw new ExpressError("Username, email, and password are required", 400);
   }
 
-  const existingUser = await User.findOne({ $or: [{ email }, { username }] });
+  const existingUser = await User.findOne({ email });
   if (existingUser) {
-    throw new ExpressError("Username or email already in use", 400);
+    throw new ExpressError("Email already in use", 400);
   }
 
   const user = new User({
@@ -225,13 +225,15 @@ module.exports.adminLogin = asyncHandler(async (req, res) => {
     { upsert: true, new: true }
   );
 
-  // Send OTP email (fire-and-forget, but log failure)
   const { sendAdminOtpEmail } = require("../services/emailService");
-  await sendAdminOtpEmail({ to: email, username: user.username, otp });
+  const emailSent = await sendAdminOtpEmail({ to: email, username: user.username, otp });
 
   sendSuccess(res, 200, {
-    message: "OTP sent to your email. Enter it to complete sign-in.",
-    email,   // echo back so frontend can pass it to step 2
+    message: emailSent
+      ? "OTP sent to your email. Enter it to complete sign-in."
+      : "Email not configured. Use the OTP below to sign in.",
+    email,
+    ...(emailSent ? {} : { otp }),
   });
 });
 
@@ -291,11 +293,15 @@ module.exports.hostLogin = asyncHandler(async (req, res) => {
   );
 
   const { sendHostOtpEmail } = require("../services/emailService");
-  await sendHostOtpEmail({ to: email, username: user.username, otp });
+  const emailSent = await sendHostOtpEmail({ to: email, username: user.username, otp });
 
   sendSuccess(res, 200, {
-    message: "OTP sent to your email. Enter it to complete sign-in.",
+    message: emailSent
+      ? "OTP sent to your email. Enter it to complete sign-in."
+      : "Email not configured. Use the OTP below to sign in.",
     email,
+    // Only expose OTP in response when email could not be sent (SMTP not configured)
+    ...(emailSent ? {} : { otp }),
   });
 });
 

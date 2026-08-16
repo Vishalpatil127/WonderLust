@@ -21,14 +21,8 @@ if (env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET) {
             return done(null, existingUser);
           }
 
-          // Generate unique username from email (e.g. vishal.patil123 from vishal.patil@gmail.com)
-          const baseUsername = email.split("@")[0].replace(/[^a-z0-9]/gi, "").toLowerCase();
-          let username = baseUsername;
-          let suffix = 1;
-          while (await User.findOne({ username })) {
-            username = `${baseUsername}${suffix}`;
-            suffix++;
-          }
+          // Generate username from email prefix
+          const username = email.split("@")[0].replace(/[^a-z0-9]/gi, "").toLowerCase() || "user";
 
           const user = await User.create({
             username,
