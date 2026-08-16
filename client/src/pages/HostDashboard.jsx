@@ -262,18 +262,19 @@ export default function HostDashboard() {
 
   useEffect(() => {
     if (!user || (user.role !== "host" && user.role !== "admin")) return;
-    Promise.all([
+
+    setLoading(true);
+    // Fetch each independently so one failure doesn't block the rest
+    Promise.allSettled([
       api.get("/dashboard/host"),
       api.get("/listings/my"),
       api.get("/bookings/host?limit=20"),
-    ])
-      .then(([dashRes, listRes, bookRes]) => {
-        setStats(dashRes.data);
-        setListings(listRes.data.listings || []);
-        setBookings(bookRes.data.bookings || []);
-      })
-      .catch((err) => setError(err.response?.data?.message || "Unable to load dashboard"))
-      .finally(() => setLoading(false));
+    ]).then(([dashRes, listRes, bookRes]) => {
+      if (dashRes.status === "fulfilled") setStats(dashRes.value.data);
+      if (listRes.status === "fulfilled") setListings(listRes.value.data.listings || []);
+      else setError("Failed to load your listings.");
+      if (bookRes.status === "fulfilled") setBookings(bookRes.value.data.bookings || []);
+    }).finally(() => setLoading(false));
   }, [user]);
 
   const handleDeleteListing = async (id) => {
