@@ -1,0 +1,52 @@
+{
+  "name": "backend-project",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "seed": "node init/index.js",
+    "client": "npm run dev --prefix ../client",
+    "dev:all": "concurrently \"npm run dev\" \"npm run client\"",
+    "test": "jest --runInBand",
+    "docker:build": "docker build -t wonderlust ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cloudinary": "^2.5.1",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "express-mongo-sanitize": "^2.1.0",
+    "express-rate-limit": "^7.1.5",
+    "helmet": "^8.0.0",
+    "jsonwebtoken": "^9.0.3",
+    "method-override": "^3.0.0",
+    "mongoose": "^9.4.1",
+    "morgan": "^1.10.0",
+    "multer": "^2.0.0",
+    "nodemailer": "^7.0.0",
+    "nodemon": "^3.1.14",
+    "passport": "^0.7.0",
+    "passport-google-oauth20": "^2.0.0",
+    "razorpay": "^2.8.4",
+    "redis": "^5.0.0",
+    "streamifier": "^0.1.1",
+    "swagger-jsdoc": "^6.0.0",
+    "swagger-ui-express": "^5.0.0",
+    "winston": "^3.0.0",
+    "wonderlust-workspace": "file:..",
+    "xss-clean": "^0.1.4",
+    "zod": "^3.0.0"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.3",
+    "jest": "^30.0.0",
+    "supertest": "^7.0.0"
+  }
+}

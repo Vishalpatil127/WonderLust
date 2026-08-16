@@ -9,3 +9,4 @@ router.get("/mine", authenticate, bookings.getMyBookings);
 router.get("/host", authenticate, authorize("host", "admin"), bookings.getHostBookings);
 
 module.exports = router;
+
