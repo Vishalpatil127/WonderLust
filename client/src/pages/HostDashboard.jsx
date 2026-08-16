@@ -264,7 +264,7 @@ export default function HostDashboard() {
     if (!user || (user.role !== "host" && user.role !== "admin")) return;
     Promise.all([
       api.get("/dashboard/host"),
-      api.get("/listings?limit=50"),
+      api.get("/listings/my"),
       api.get("/bookings/host?limit=20"),
     ])
       .then(([dashRes, listRes, bookRes]) => {

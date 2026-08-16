@@ -6,7 +6,9 @@ const { getCachedData, setCachedData } = require("../services/cacheService");
 
 const buildFilter = (query) => {
   const filter = {};
-  const { search, country, location, minPrice, maxPrice, status } = query;
+  const { search, country, location, minPrice, maxPrice, status, owner } = query;
+
+  if (owner) filter.owner = owner;
 
   if (search) {
     filter.$or = [
@@ -156,4 +158,11 @@ module.exports.deleteListing = asyncHandler(async (req, res) => {
 
   await listing.deleteOne();
   sendSuccess(res, 200, { message: "Listing deleted" });
+});
+
+module.exports.getMyListings = asyncHandler(async (req, res) => {
+  const listings = await Listing.find({ owner: req.user._id })
+    .sort({ createdAt: -1 })
+    .limit(50);
+  sendSuccess(res, 200, { listings, count: listings.length });
 });
