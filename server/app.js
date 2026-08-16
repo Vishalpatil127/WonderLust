@@ -32,18 +32,21 @@ const allowedOrigins = (env.CLIENT_URL || "http://localhost:5173")
   .map((origin) => origin.trim())
   .filter(Boolean);
 
-// Connect to MongoDB — on Vercel serverless, connections are reused across invocations
-let dbConnected = false;
-const ensureDB = async () => {
-  if (!dbConnected) {
-    await connectDB();
-    dbConnected = true;
-  }
-};
-ensureDB().catch((err) => {
+// Connect to MongoDB — cached across serverless invocations
+connectDB().catch((err) => {
   logger.error("MongoDB connection failed:", err.message);
 });
 
+// Ensure DB is connected before every request (critical for Vercel serverless)
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    logger.error("MongoDB connection failed on request:", err.message);
+    res.status(503).json({ success: false, message: "Database unavailable. Please try again." });
+  }
+});
 app.use(morgan("combined"));
 app.use(cookieParser());
 app.use(
