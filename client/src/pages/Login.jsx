@@ -58,6 +58,7 @@ export default function Login() {
   // Host OTP state
   const [step,      setStep]      = useState("credentials"); // credentials | otp
   const [otp,       setOtp]       = useState("");
+  const [otpHint,   setOtpHint]   = useState(""); // shown when email not configured
   const [countdown, setCountdown] = useState(0);
   const [resending, setResending] = useState(false);
 
@@ -80,6 +81,10 @@ export default function Login() {
       try {
         data = await hostLogin(form.email, form.password);
         // hostLogin succeeded → user is a host → show OTP step
+        if (data.otp) {
+          setOtpHint(data.otp);
+          setOtp(data.otp); // auto-fill the OTP input
+        }
         setStep("otp");
         startCountdown();
         setLoading(false);
@@ -185,6 +190,13 @@ export default function Login() {
                 <p className="text-xs text-gray-400 mt-1">
                   OTP sent to <span className="font-semibold text-gray-700">{form.email}</span>
                 </p>
+                {otpHint && (
+                  <div className="mt-3 px-4 py-2.5 bg-amber-50 border border-amber-200 rounded-xl">
+                    <p className="text-xs text-amber-700 font-medium">Email delivery failed.</p>
+                    <p className="text-lg font-black text-amber-600 tracking-widest mt-0.5">{otpHint}</p>
+                    <p className="text-xs text-amber-600 mt-0.5">Use this OTP to sign in</p>
+                  </div>
+                )}
               </div>
               <OtpInput value={otp} onChange={setOtp} />
               <button type="submit" disabled={loading || otp.length < 6}

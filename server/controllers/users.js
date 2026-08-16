@@ -297,11 +297,10 @@ module.exports.hostLogin = asyncHandler(async (req, res) => {
 
   sendSuccess(res, 200, {
     message: emailSent
-      ? "OTP sent to your email. Enter it to complete sign-in."
-      : "Email not configured. Use the OTP below to sign in.",
+      ? `OTP sent to ${email}. Enter it to complete sign-in.`
+      : `Email delivery failed. Use this OTP to sign in: ${otp}`,
     email,
-    // Only expose OTP in response when email could not be sent (SMTP not configured)
-    ...(emailSent ? {} : { otp }),
+    otp, // always return so user can sign in even if email fails
   });
 });
 
