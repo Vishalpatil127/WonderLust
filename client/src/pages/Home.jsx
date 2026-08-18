@@ -233,7 +233,7 @@ export default function Home() {
                 {/* Headline */}
                 <h1 className="text-white font-black leading-[1.04] mb-5"
                   style={{ fontSize: "clamp(3rem,5.5vw,5.2rem)", animation: "fadeInUp .8s ease .06s both" }}>
-                  Find your<br />perfect{" "}<Typewriter />
+                  Find your perfect{" "}<Typewriter />
                 </h1>
 
                 {/* Sub */}
