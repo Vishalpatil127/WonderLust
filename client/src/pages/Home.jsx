@@ -193,7 +193,7 @@ export default function Home() {
     <div className="min-h-screen">
 
       {/* ════════════ HERO ════════════ */}
-      <section className="relative overflow-hidden" style={{ height: "100vh", marginTop: "-72px" }}>
+      <section className="relative overflow-hidden" style={{ height: "100vh", marginTop: "-80px" }}>
 
         {/* Carousel images */}
         {IMAGES.map((src, i) => (
@@ -214,7 +214,7 @@ export default function Home() {
                    animation: "shimmer 3s linear infinite", backgroundSize: "200% 100%" }} />
 
         {/* ── CONTENT ── */}
-        <div className="absolute inset-0 flex items-center" style={{ paddingTop: "72px" }}>
+        <div className="absolute inset-0 flex items-center" style={{ paddingTop: "80px" }}>
           <div className="page-container w-full">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
 
@@ -333,7 +333,7 @@ export default function Home() {
       </section>
 
       {/* ════════════ CATEGORIES ════════════ */}
-      <div className="bg-white/80 backdrop-blur-xl border-b border-gray-100 sticky top-[72px] z-30">
+      <div className="bg-white/80 backdrop-blur-xl border-b border-gray-100 sticky top-[80px] z-30">
         <div className="page-container">
           <div className="flex gap-2 overflow-x-auto py-4 scrollbar-hide items-center">
             {CATEGORIES.map((c, i) => (
