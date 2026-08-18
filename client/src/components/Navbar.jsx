@@ -111,7 +111,7 @@ export default function Navbar() {
   return (
     <header className={`sticky top-0 z-50 transition-all duration-300 ${
       isGlass
-        ? "bg-transparent border-b border-transparent"
+        ? "bg-gradient-to-b from-black/40 to-transparent border-b border-transparent"
         : "bg-white border-b border-gray-200 shadow-sm"
     }`}>
       <div className="page-container">
