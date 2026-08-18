@@ -236,12 +236,7 @@ export default function Home() {
                   Find your perfect{" "}<Typewriter />
                 </h1>
 
-                {/* Sub */}
-                <p className="text-white/55 leading-relaxed mb-9 max-w-md"
-                  style={{ fontSize: "clamp(.95rem,1.4vw,1.1rem)", animation: "fadeInUp .9s ease .14s both" }}>
-                  Unique homes, luxury villas, mountain cabins and beachfront retreats —
-                  book with confidence and travel with joy.
-                </p>
+
 
                 {/* CTAs */}
                 <div className="flex flex-wrap gap-3 mb-10"
