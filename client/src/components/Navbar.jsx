@@ -8,6 +8,14 @@ import {
 import { useAuth } from "../context/AuthContext";
 import api from "../api/axios";
 
+const SORT_OPTIONS = [
+  { value: "newest",     label: "Newest" },
+  { value: "oldest",     label: "Oldest" },
+  { value: "price_asc",  label: "Price: Low → High" },
+  { value: "price_desc", label: "Price: High → Low" },
+];
+const SORT_LABELS = Object.fromEntries(SORT_OPTIONS.map(o => [o.value, o.label]));
+
 export default function Navbar() {
   const { user, logout } = useAuth();
   const navigate  = useNavigate();
@@ -19,6 +27,7 @@ export default function Navbar() {
   const [menuOpen,     setMenuOpen]     = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [filterOpen,   setFilterOpen]   = useState(false);
+  const [sortOpen,     setSortOpen]     = useState(false);
   const [scrolled,     setScrolled]     = useState(false);
   const [locations,    setLocations]    = useState([]);
   const [countries,    setCountries]    = useState([]);
@@ -52,10 +61,11 @@ export default function Navbar() {
   const [sort,     setSort]     = useState(searchParams.get("sort")     || "newest");
 
   const filterRef = useRef(null);
+  const sortRef   = useRef(null);
   const isHost  = user?.role === "host"  || user?.role === "admin";
   const isAdmin = user?.role === "admin";
 
-  const closeAll = () => { setMenuOpen(false); setUserMenuOpen(false); setFilterOpen(false); };
+  const closeAll = () => { setMenuOpen(false); setUserMenuOpen(false); setFilterOpen(false); setSortOpen(false); };
 
   const handleLogout = async () => {
     closeAll();
@@ -66,6 +76,7 @@ export default function Navbar() {
   useEffect(() => {
     const handler = (e) => {
       if (filterRef.current && !filterRef.current.contains(e.target)) setFilterOpen(false);
+      if (sortRef.current   && !sortRef.current.contains(e.target))   setSortOpen(false);
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
@@ -161,24 +172,42 @@ export default function Navbar() {
                   }`}
                 />
 
-                {/* Sort */}
-                <div className={`hidden md:flex items-center gap-1 border-l pl-2 ml-1 ${
-                  isGlass && !filterOpen ? "border-white/30" : "border-gray-200"
-                }`}>
-                  <ArrowUpDown className={`w-3.5 h-3.5 shrink-0 ${isGlass && !filterOpen ? "text-white/60" : "text-gray-400"}`} />
-                  <select
-                    value={sort}
-                    onChange={(e) => { setSort(e.target.value); navigate(`/?${buildParams({ sort: e.target.value })}`); }}
-                    className={`text-xs bg-transparent outline-none cursor-pointer ${
-                      isGlass && !filterOpen ? "text-white/80" : "text-gray-600"
+                {/* Sort — custom dropdown */}
+                <div className="hidden md:block relative shrink-0" ref={sortRef}>
+                  <button
+                    type="button"
+                    onClick={() => setSortOpen(o => !o)}
+                    className={`flex items-center gap-1 border-l pl-2 ml-1 text-xs font-medium select-none ${
+                      isGlass && !filterOpen ? "border-white/30 text-white/80" : "border-gray-200 text-gray-600"
                     }`}
-                    aria-label="Sort"
                   >
-                    <option value="newest">Newest</option>
-                    <option value="price_asc">Price ↑</option>
-                    <option value="price_desc">Price ↓</option>
-                    <option value="oldest">Oldest</option>
-                  </select>
+                    <ArrowUpDown className={`w-3.5 h-3.5 shrink-0 ${isGlass && !filterOpen ? "text-white/60" : "text-gray-400"}`} />
+                    <span>{SORT_LABELS[sort]}</span>
+                  </button>
+
+                  {sortOpen && (
+                    <div className="absolute top-[calc(100%+10px)] right-0 w-44 bg-white rounded-2xl
+                                    border border-gray-100 shadow-modal overflow-hidden z-[9999] animate-slide-up">
+                      {SORT_OPTIONS.map(({ value, label }) => (
+                        <button
+                          key={value}
+                          type="button"
+                          onClick={() => {
+                            setSort(value);
+                            setSortOpen(false);
+                            navigate(`/?${buildParams({ sort: value })}`);
+                          }}
+                          className={`w-full text-left px-4 py-2.5 text-sm transition-colors
+                            ${sort === value
+                              ? "bg-brand-50 text-brand font-semibold"
+                              : "text-gray-700 hover:bg-gray-50"
+                            }`}
+                        >
+                          {label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 {/* Filters */}
