@@ -114,10 +114,10 @@ export default function Navbar() {
         ? "border-b border-white/10"
         : "bg-white border-b border-gray-200 shadow-sm"
     }`} style={isGlass ? {
-      background: "rgba(20, 20, 20, 0.35)",
-      backdropFilter: "blur(12px)",
-      WebkitBackdropFilter: "blur(12px)",
-      borderBottom: "1px solid rgba(255,255,255,0.12)",
+      background: "rgba(10, 10, 10, 0.18)",
+      backdropFilter: "blur(14px)",
+      WebkitBackdropFilter: "blur(14px)",
+      borderBottom: "1px solid rgba(255,255,255,0.10)",
     } : undefined}>
       <div className="page-container">
         <div className="flex items-center gap-3 h-20 md:h-28">

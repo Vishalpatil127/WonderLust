@@ -199,14 +199,21 @@ export default function Home() {
         {IMAGES.map((src, i) => (
           <img key={src} src={src} alt="" loading={i === 0 ? "eager" : "lazy"}
             className="hero-image absolute inset-0 w-full h-full object-cover transition-opacity duration-[1200ms]"
-            style={{ opacity: i === imgIdx ? 1 : 0, transform: `translateY(${scrollY * 0.22}px) scale(1.08)` }} />
+            style={{
+              opacity: i === imgIdx ? 1 : 0,
+              transform: `translateY(${scrollY * 0.22}px) scale(1.08)`,
+              objectPosition: "center 55%",
+            }} />
         ))}
 
-        {/* Gradient layers */}
+        {/* Gradient layers — left darker for text legibility, right lighter to show image */}
         <div className="absolute inset-0" style={{
-          background: "linear-gradient(105deg,rgba(0,0,0,.72) 0%,rgba(0,0,0,.38) 50%,rgba(0,0,0,.08) 100%)" }} />
+          background: "linear-gradient(105deg,rgba(0,0,0,.78) 0%,rgba(0,0,0,.42) 45%,rgba(0,0,0,.10) 100%)" }} />
         <div className="absolute inset-0" style={{
-          background: "linear-gradient(to top,rgba(0,0,0,.5) 0%,transparent 55%)" }} />
+          background: "linear-gradient(to top,rgba(0,0,0,.45) 0%,rgba(0,0,0,.15) 35%,transparent 60%)" }} />
+        {/* Top-only dark band so navbar text stays readable without darkening the whole image */}
+        <div className="absolute inset-x-0 top-0 h-32" style={{
+          background: "linear-gradient(to bottom,rgba(0,0,0,.45) 0%,transparent 100%)" }} />
 
         {/* Top shimmer bar */}
         <div className="absolute top-0 inset-x-0 h-px"
