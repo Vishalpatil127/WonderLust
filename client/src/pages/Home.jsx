@@ -184,6 +184,10 @@ export default function Home() {
     const p = new URLSearchParams(sp);
     if (c) p.set("search", c); else p.delete("search");
     setSp(p);
+    // Scroll to listings after state update, offset for sticky navbar + category bar (~180px)
+    setTimeout(() => {
+      gridRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 0);
   };
 
   const scrollDown = () => gridRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -390,7 +394,7 @@ export default function Home() {
       </div>
 
       {/* ════════════ LISTINGS ════════════ */}
-      <div ref={gridRef} className="min-h-screen bg-gray-50">
+      <div ref={gridRef} className="min-h-screen bg-gray-50" style={{ scrollMarginTop: "175px" }}>
         <div className="page-container py-10">
           <Reveal className="flex items-start justify-between mb-8">
             <div>
