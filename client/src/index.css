@@ -46,6 +46,19 @@
     @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
   }
 
+  .hero-image {
+    object-fit: cover;
+    object-position: 50% 42%;
+  }
+
+  @media (max-width: 767px) {
+    .hero-image { object-position: 58% 42%; }
+  }
+
+  @media (min-width: 768px) and (max-width: 1023px) {
+    .hero-image { object-position: 54% 42%; }
+  }
+
   /* ── Buttons ── */
   .btn {
     @apply inline-flex items-center justify-center gap-2 font-semibold

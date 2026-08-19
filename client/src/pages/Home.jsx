@@ -198,20 +198,31 @@ export default function Home() {
         {/* Carousel images */}
         {IMAGES.map((src, i) => (
           <img key={src} src={src} alt="" loading={i === 0 ? "eager" : "lazy"}
-            className="absolute inset-0 w-full h-full object-cover transition-opacity duration-[1200ms]"
+            className="hero-image absolute inset-0 w-full h-full object-cover transition-opacity duration-[1200ms]"
             style={{ opacity: i === imgIdx ? 1 : 0, transform: `translateY(${scrollY * 0.22}px) scale(1.08)` }} />
         ))}
 
         {/* Gradient layers */}
         <div className="absolute inset-0" style={{
-          background: "linear-gradient(105deg,rgba(0,0,0,.92) 0%,rgba(0,0,0,.55) 50%,rgba(0,0,0,.15) 100%)" }} />
+          background: "linear-gradient(105deg,rgba(0,0,0,.72) 0%,rgba(0,0,0,.38) 50%,rgba(0,0,0,.08) 100%)" }} />
         <div className="absolute inset-0" style={{
-          background: "linear-gradient(to top,rgba(0,0,0,.75) 0%,transparent 55%)" }} />
+          background: "linear-gradient(to top,rgba(0,0,0,.5) 0%,transparent 55%)" }} />
 
         {/* Top shimmer bar */}
         <div className="absolute top-0 inset-x-0 h-px"
           style={{ background: "linear-gradient(90deg,transparent,#f43f5e 30%,#fb923c 60%,transparent)",
                    animation: "shimmer 3s linear infinite", backgroundSize: "200% 100%" }} />
+
+        {/* Animated mesh gradient orbs */}
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full pointer-events-none"
+          style={{ background: "radial-gradient(circle,rgba(244,63,94,.15),transparent 70%)",
+                   animation: "orbFloat 8s ease-in-out infinite" }} />
+        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full pointer-events-none"
+          style={{ background: "radial-gradient(circle,rgba(251,146,60,.12),transparent 70%)",
+                   animation: "orbFloat 10s ease-in-out 2s infinite reverse" }} />
+        <div className="absolute top-1/2 left-1/2 w-64 h-64 rounded-full pointer-events-none"
+          style={{ background: "radial-gradient(circle,rgba(99,102,241,.1),transparent 70%)",
+                   animation: "orbFloat 12s ease-in-out 4s infinite" }} />
 
         {/* ── CONTENT ── */}
         <div className="absolute inset-0 flex items-center" style={{ paddingTop: "80px" }}>
@@ -331,6 +342,24 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* ════════════ MARQUEE STRIP ════════════ */}
+      <div className="bg-gray-950 border-y border-white/5 py-4 overflow-hidden">
+        <div className="flex" style={{ animation: "marquee 25s linear infinite" }}>
+          {[...Array(3)].map((_, rep) => (
+            <div key={rep} className="flex items-center gap-8 shrink-0 px-8">
+              {["🏖️ Bali, Indonesia","⛰️ Santorini, Greece","🏙️ Tokyo, Japan","🌾 Tuscany, Italy",
+                "💎 Maldives","🪵 Banff, Canada","🌊 Amalfi Coast","🏜️ Marrakech, Morocco",
+                "🏔️ Swiss Alps","🌴 Phuket, Thailand"].map((d) => (
+                <span key={d} className="text-white/40 text-sm font-medium whitespace-nowrap flex items-center gap-2">
+                  {d}
+                  <span className="w-1 h-1 rounded-full bg-white/20 inline-block" />
+                </span>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
 
       {/* ════════════ CATEGORIES ════════════ */}
       <div className="bg-white/80 backdrop-blur-xl border-b border-gray-100 sticky top-[80px] z-30">
