@@ -271,3 +271,13 @@
 .animate-fade-in-up { animation: fadeInUp  0.5s ease both; }
 .animate-blink      { animation: blink     1s step-end infinite; }
 .animate-shimmer    { animation: shimmer   2s linear infinite; background-size: 200% 100%; }
+
+@keyframes orbFloat {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%       { transform: translateY(-30px) scale(1.05); }
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-33.333%); }
+}
